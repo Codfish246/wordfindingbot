@@ -141,6 +141,11 @@ async def on_message(message):
         embed.set_footer(text="Sent " + dt_string)
         await channel.send(embed=embed)
 
+    if message.content == ('!shutdown') and message.author.id == 102341036403068928:
+        emoji = '\N{THUMBS UP SIGN}'
+        await message.add_reaction(emoji)
+        await bot.close()
+
 
 bot.run(TEST_TOKEN) #fishybot for testing 
 #bot.run(PROD_TOKEN) #gchq bot

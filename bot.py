@@ -85,6 +85,48 @@ async def on_message(message):
         else:
             await channel.send('Word ' + wordToFind.content + ' not found anywhere in text.')
 
+    if message.content == ('!legacyfind'):
+        channel = message.channel
+        
+        await channel.send('Send the word you wish to find:')
+        def check(m):
+            return m.author == message.author and m.channel == channel
+
+        wordToFind = await bot.wait_for('message', check=check)
+        """try:
+            wordToFind = await bot.wait_for('message', timeout=60.0, check=check)
+        except asyncio.TimeoutError:
+            await channel.send('*Input timed out!*')
+        else:
+            await channel.send('Send the text you wish to search:')"""
+
+        ######------------------------------#######
+
+        await channel.send('Send the text you wish to search:')
+        def check(m):
+            return m.author == message.author and m.channel == channel
+        
+        textToSearch = await bot.wait_for('message', check=check)
+        
+        emoji = '\N{THUMBS UP SIGN}'
+        await textToSearch.add_reaction(emoji)
+        
+        #async with channel.typing():
+        if (contains_word(textToSearch.content, wordToFind.content)):
+            await channel.send('Word ' + wordToFind.content + ' found in text!')
+        else:
+            await channel.send('Word ' + wordToFind.content + ' not found in text.')
+        """try:
+            textToSearch = await bot.wait_for('message', timeout=60.0, check=check)
+        except asyncio.TimeoutError:
+            await channel.send('*Input timed out!*')
+        else:
+            async with channel.typing():
+                if (contains_word(textToSearch.content, wordToFind.content)):
+                    await channel.send('Word ' + wordToFind.content + ' found in text!')
+                else:
+                    await channel.send('Word ' + wordToFind.content + ' not found in text.')"""
+
 
 bot.run(TEST_TOKEN) #fishybot for testing 
 #bot.run(PROD_TOKEN) #gchq bot

@@ -22,6 +22,8 @@ async def on_ready():
     activity = discord.Activity(name='!help', emoji=emoji, type=discord.ActivityType.custom)
     await bot.change_presence(activity=activity)
 
+def contains_word(s, w):
+    return f' {w} ' in f' {s} '
 
 def findWholeWord(w):
     return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
@@ -56,6 +58,32 @@ async def on_message(message):
             await channel.send('Word ' + wordToFind.content + ' not found in text.')
 
         #findWholeWord('seek')('those who seek shall find') #match
+
+    #if message.content.startswith('!find2')
+    if message.content == ('!find2'):
+        channel = message.channel
+
+        await channel.send('Send the word you wish to find:')
+        def check(m):
+            return m.author == message.author and m.channel == channel
+        
+        wordToFind = await bot.wait_for('message', check=check)
+
+        await channel.send('Send the text you wish to search:')
+        def check(m):
+            return m.author == message.author and m.channel == channel
+        
+        textToSearch = await bot.wait_for('message', check=check)
+
+
+        #async with channel.typing():
+        emoji = '\N{THUMBS UP SIGN}'
+        await textToSearch.add_reaction(emoji)
+        
+        if wordToFind.content in textToSearch.content:
+            await channel.send('Word ' + wordToFind.content + ' found in text.')
+        else:
+            await channel.send('Word ' + wordToFind.content + ' not found anywhere in text.')
 
 
 bot.run(TEST_TOKEN) #fishybot for testing 

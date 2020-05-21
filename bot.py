@@ -18,9 +18,7 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     
-    emoji = '\N{ROBOT FACE}'
-    activity = discord.Activity(name='!help', emoji=emoji, type=discord.ActivityType.custom)
-    await bot.change_presence(activity=activity)
+    await client.change_presence(activity=discord.Game(name='!help'))
 
 def contains_word(s, w):
     return f' {w} ' in f' {s} '

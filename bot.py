@@ -126,6 +126,20 @@ async def on_message(message):
                     await channel.send('Word ' + wordToFind.content + ' found in text!')
                 else:
                     await channel.send('Word ' + wordToFind.content + ' not found in text.')"""
+        
+
+    if message.content.startswith('!help'):
+        channel = message.channel
+        now = datetime.now()
+        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        embed=discord.Embed(title="Help", description="Commands", color=0x191919)
+        #embed=discord.Embed(title="Help", description="Commands\n(All time out in 60 secs)", color=0x191919)
+        embed.set_author(name="GCHQ", icon_url="https://pbs.twimg.com/profile_images/1216637466440097792/6OmvLk7Y_400x400.jpg")
+        embed.add_field(name="!find", value="Main word finding command", inline=True)
+        embed.add_field(name="!find2", value="Different word finding method, includes words inside other words, like 'word' in 'swordsmith'.", inline=True)
+        embed.add_field(name="!legacyfind", value="Old version of the main word finding command.", inline=True)
+        embed.set_footer(text="Sent " + dt_string)
+        await channel.send(embed=embed)
 
 
 bot.run(TEST_TOKEN) #fishybot for testing 

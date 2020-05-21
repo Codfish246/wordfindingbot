@@ -2,7 +2,7 @@ import discord
 import asyncio
 from datetime import datetime
 import re
-from os import getenv
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,7 +18,7 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     
-    await client.change_presence(activity=discord.Game(name='!help'))
+    await bot.change_presence(activity=discord.Game(name='!help'))
 
 def contains_word(s, w):
     return f' {w} ' in f' {s} '

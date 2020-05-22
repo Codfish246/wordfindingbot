@@ -219,8 +219,10 @@ async def on_message(message):
 	        await userToCheckMsg.add_reaction(emoji)"""
 	        statusTrackChannel = int(statusTrackChannelMsg.content)
 	        await channel.send('User id and channel id set and tracking started.')
-	    else:
+	    elif changeChannelSet == False and statusTrackChannel != 0 and userToCheck != 0:
 	    	await channel.send('User id and channel id set and tracking started.')
+	    else:
+	    	await channel.send('Error: probably something wrong with channel or user id, like it\'s not set or something.')
 
     if message.content == ('!untrackuser')
     	channel = message.channel

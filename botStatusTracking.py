@@ -201,11 +201,10 @@ async def on_message(message):
 
 @bot.event
 async def on_member_update(memberBefore, memberAfter):
-	if memberBefore.id == bot.user.id or memberAfter == bot.user.id or userToCheck == 0:
+	if memberBefore.id == bot.user.id or userToCheck == 0:
 		return
 
-
-
+	
 
 
 bot.run(TEST_TOKEN) #fishybot for testing 

@@ -175,17 +175,18 @@ async def on_message(message):
         await userToCheckMsg.add_reaction(emoji)"""
         userToCheck = int(userToCheckMsg.content)
 
-        changeChannelSet = False
+        changeChannelSet = True
         if statusTrackChannel != 0:
-            trackuserFormatString = ('Channel id currently set to <#{0}> ({0}), Do you want to change it? React:').format(statusTrackChannel)
+            trackuserFormatString = ('Channel id currently set to <#{0}> ({0}), Do you want to change it? React: ⬆').format(statusTrackChannel)
             await channel.send(trackuserFormatString)
             emojiYes = '\N{THUMBS UP SIGN}'
             emojiNo = '\N{THUMBS DOWN SIGN}'
-            await message.add_reaction(emojiYes)
-            await message.add_reaction(emojiNo)
+            await userToCheckMsg.add_reaction(emojiYes)
+            await userToCheckMsg.add_reaction(emojiNo)
 
             def check(reaction, user):
                 return user == message.author and (str(reaction.emoji) == '👍' or str(reaction.emoji) == '👎')
+            
             try:
                 reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
             except asyncio.TimeoutError:
@@ -196,19 +197,33 @@ async def on_message(message):
                 elif str(reaction.emoji) == '👎':
                     changeChannelSet = False
 
-        if changeChannelSet == True:
-            await channel.send('Send channel id to post tracking status updates in:')
-            def check(m):
-                return m.author == message.author and m.channel == channel
-            statusTrackChannelMsg = await bot.wait_for('message', check=check)
-            """emoji = 'backslashN{THUMBS UP SIGN}'
-            await userToCheckMsg.add_reaction(emoji)"""
-            statusTrackChannel = int(statusTrackChannelMsg.content)
-            await channel.send('User id and channel id set and tracking started.')
-        elif changeChannelSet == False and statusTrackChannel != 0 and userToCheck != 0:
-            await channel.send('User id and channel id set and tracking started.')
+            if changeChannelSet == True:
+                await channel.send('Send channel id to post tracking status updates in:')
+                def check(m):
+                    return m.author == message.author and m.channel == channel
+                statusTrackChannelMsg = await bot.wait_for('message', check=check)
+                """emoji = 'backslashN{THUMBS UP SIGN}'
+                await userToCheckMsg.add_reaction(emoji)"""
+                statusTrackChannel = int(statusTrackChannelMsg.content)
+                await channel.send('User id and channel id set and tracking started.')
+            elif changeChannelSet == False and statusTrackChannel != 0 and userToCheck != 0:
+                await channel.send('User id and channel id set and tracking started.')
+            else:
+                await channel.send('Error: probably something wrong with channel or user id, like it\'s not set or something.')
         else:
-            await channel.send('Error: probably something wrong with channel or user id, like it\'s not set or something.')
+            if changeChannelSet == True:
+                await channel.send('Send channel id to post tracking status updates in:')
+                def check(m):
+                    return m.author == message.author and m.channel == channel
+                statusTrackChannelMsg = await bot.wait_for('message', check=check)
+                """emoji = 'backslashN{THUMBS UP SIGN}'
+                await userToCheckMsg.add_reaction(emoji)"""
+                statusTrackChannel = int(statusTrackChannelMsg.content)
+                await channel.send('User id and channel id set and tracking started.')
+            elif changeChannelSet == False and statusTrackChannel != 0 and userToCheck != 0:
+                await channel.send('User id and channel id set and tracking started.')
+            else:
+                await channel.send('Error: probably something wrong with channel or user id, like it\'s not set or something.')
 
     if message.content == ('!untrackuser'):
         channel = message.channel

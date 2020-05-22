@@ -239,16 +239,18 @@ async def on_message(message):
     	channel = message.channel
     	if userToCheck != 0:
     		fetchedUser = await bot.fetch_user(userToCheck)
-    		await channel.send('User id set is: ' + userToCheck + ', aka: ' + fetchedUser.name)
+    		await channel.send('User ID set is: {0}, aka: {1}/<@{0}> \nChannel ID set is: {2}, aka: <#{2}>').format(userToCheck, fetchedUser.name, statusTrackChannel)
     	else:
-    		await channel.send('Error: User (ID) is not set')
-        
+    		await channel.send('Error: User or channel (ID) is not set')
+
 
 
 @bot.event
 async def on_member_update(memberBefore, memberAfter):
 	if memberBefore.id == bot.user.id or userToCheck == 0:
 		return
+
+	
 
 
 

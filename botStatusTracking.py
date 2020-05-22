@@ -1,3 +1,5 @@
+#Made by Codfish246
+
 """
 discord.on_member_update(before, after)
 Called when a Member updates their profile.
@@ -42,7 +44,7 @@ def findWholeWord(w):
     return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
 
 userToCheck = 0
-
+statusTrackChannel = 0
 
 @bot.event
 async def on_message(message):
@@ -75,6 +77,7 @@ async def on_message(message):
 
         #findWholeWord('seek')('those who seek shall find') #match
 
+
     #if message.content.startswith('!find2')
     if message.content == ('!find2'):
         channel = message.channel
@@ -100,6 +103,7 @@ async def on_message(message):
             await channel.send('Word ' + wordToFind.content + ' found in text.')
         else:
             await channel.send('Word ' + wordToFind.content + ' not found anywhere in text.')
+
 
     if message.content == ('!legacyfind'):
         channel = message.channel
@@ -158,35 +162,78 @@ async def on_message(message):
         embed.add_field(name="User status tracking section", value="", inline=False)
         embed.add_field(name="!trackuser", value="Sets a user id for tracking a user's status and sending an update when it changes.", inline=True)
         embed.add_field(name="!untrackuser", value="Untracks a user set by !trackuser", inline=True)
-        embed.add_field(name="!userset", value="Shows the currently set user.", inline=True)
+        embed.add_field(name="!trackingset", value="Shows the currently set user and logging channel.", inline=True)
         embed.set_footer(text="Sent " + dt_string)
         await channel.send(embed=embed)
+
 
     if message.content == ('!shutdown') and message.author.id == 102341036403068928:
         emoji = '\N{THUMBS UP SIGN}'
         await message.add_reaction(emoji)
         await bot.close()
 
+
     if message.content == ('!trackuser')
     	channel = message.channel
+
     	await channel.send('Send user\'s id to track:')
         def check(m):
             return m.author == message.author and m.channel == channel
-
         userToCheckMsg = await bot.wait_for('message', check=check)
         """emoji = '\N{THUMBS UP SIGN}'
         await userToCheckMsg.add_reaction(emoji)"""
-        userToCheck = userToCheckMsg.content
-        await channel.send('User id set and tracking started.')
+        userToCheck = int(userToCheckMsg.content)
+
+        changeChannelSet = True
+        if statusTrackChannel != 0:
+        	await channel.send('Channel id currently set to <#{0}> ({0}), Do you want to change it? React:').format(statusTrackChannel)
+	        emojiYes = '\N{THUMBS UP SIGN}'
+	        emojiNo = '\N{THUMBS DOWN SIGN}'
+	        await message.add_reaction(emojiYes)
+	        await message.add_reaction(emojiNo)
+
+	        def check(reaction, user):
+	            return user == message.author and str(reaction.emoji) == '👍'
+	        try:
+	            reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
+	        except asyncio.TimeoutError:
+	            await channel.send('Timed out.')
+	        else:
+	            changeChannelSet = True
+
+	        def check(reaction, user):
+	            return user == message.author and str(reaction.emoji) == '👎'
+	        try:
+	            reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
+	        except asyncio.TimeoutError:
+	            await channel.send('Timed out.')
+	        else:
+	            changeChannelSet = False
+
+	    if changeChannelSet == True:
+	        await channel.send('Send channel id to post tracking status updates in:')
+	        def check(m):
+	            return m.author == message.author and m.channel == channel
+	        statusTrackChannelMsg = await bot.wait_for('message', check=check)
+	        """emoji = '\N{THUMBS UP SIGN}'
+	        await userToCheckMsg.add_reaction(emoji)"""
+	        statusTrackChannel = int(statusTrackChannelMsg.content)
+	        await channel.send('User id and channel id set and tracking started.')
+	    else:
+	    	await channel.send('User id and channel id set and tracking started.')
 
     if message.content == ('!untrackuser')
     	channel = message.channel
         """emoji = '\N{THUMBS UP SIGN}'
-        await userToCheckMsg.add_reaction(emoji)"""
+        await message.add_reaction(emoji)"""
+
         userToCheck = 0
+        #statusTrackChannel = 0;
+        #await channel.send('User id and channel id unset and tracking stopped.')
         await channel.send('User id unset and tracking stopped.')
 
-    if message.content == ('!userset')
+
+    if message.content == ('!trackingset')
     	channel = message.channel
     	if userToCheck != 0:
     		fetchedUser = await bot.fetch_user(userToCheck)
@@ -196,15 +243,11 @@ async def on_message(message):
         
 
 
-    	
-
-
 @bot.event
 async def on_member_update(memberBefore, memberAfter):
 	if memberBefore.id == bot.user.id or userToCheck == 0:
 		return
 
-	
 
 
 bot.run(TEST_TOKEN) #fishybot for testing 

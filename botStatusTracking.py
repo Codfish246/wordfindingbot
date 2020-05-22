@@ -151,11 +151,14 @@ async def on_message(message):
         embed=discord.Embed(title="Help", description="Commands", color=0x191919)
         #embed=discord.Embed(title="Help", description="Commands\n(All time out in 60 secs)", color=0x191919)
         embed.set_author(name="GCHQ", icon_url="https://pbs.twimg.com/profile_images/1216637466440097792/6OmvLk7Y_400x400.jpg")
+        embed.add_field(name="Find section", value="", inline=False)
         embed.add_field(name="!find", value="Main word finding command", inline=True)
         embed.add_field(name="!find2", value="Different word finding method, includes words inside other words, like 'word' in 'swordsmith'.", inline=True)
         embed.add_field(name="!legacyfind", value="Old version of the main word finding command.", inline=True)
-        embed.add_field(name="!trackuser", value="Sets a user id for tracking a user's status and sending an update when it changes.", inline=False)
-        embed.add_field(name="!untrackuser", value="Untracks a user set by !trackuser", inline=False)
+        embed.add_field(name="User status tracking section", value="", inline=False)
+        embed.add_field(name="!trackuser", value="Sets a user id for tracking a user's status and sending an update when it changes.", inline=True)
+        embed.add_field(name="!untrackuser", value="Untracks a user set by !trackuser", inline=True)
+        embed.add_field(name="!userset", value="Shows the currently set user.", inline=True)
         embed.set_footer(text="Sent " + dt_string)
         await channel.send(embed=embed)
 
@@ -182,6 +185,15 @@ async def on_message(message):
         await userToCheckMsg.add_reaction(emoji)"""
         userToCheck = 0
         await channel.send('User id unset and tracking stopped.')
+
+    if message.content == ('!userset')
+    	channel = message.channel
+    	if userToCheck != 0:
+    		fetchedUser = await bot.fetch_user(userToCheck)
+    		await channel.send('User id set is: ' + userToCheck + ', aka: ' + fetchedUser.name)
+    	else:
+    		await channel.send('Error: User (ID) is not set')
+        
 
 
     	

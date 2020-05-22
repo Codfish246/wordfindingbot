@@ -254,6 +254,14 @@ async def on_member_update(memberBefore, memberAfter):
     if memberBefore.id == bot.user.id or userToCheck == 0:
         return
 
+    if memberBefore.id == userToCheck and not (memberBefore.status == memberAfter.status or memberBefore.activity == memberAfter.activity):
+        channel = bot.get_channel(statusTrackChannel)
+
+        statusChangeFormatStr = ('❗{0}\'s ({0}) status or activity has changed from: {1}, to: {2} \nOr activity, from: {3}, to: {4} \nWas user on mobile: {5}, is user now on mobile: {6}\n User\'s status on mobile: Before {7} Now {8}, User\'s status on desktop: Before {9} Now {10}, User\'s status on web: Before {11} Now {12}').format(userToCheck, memberBefore.status, memberAfter.status, memberBefore.activity, memberAfter.activity, memberBefore.is_on_mobile(), memberAfter.is_on_mobile(), memberBefore.mobile_status, memberAfter.mobile_status, memberBefore.desktop_status, memberAfter.desktop_status, memberBefore.web_status, memberAfter.web_status)
+        await channel.send(statusChangeFormatStr)
+    else:
+        return
+
 
 bot.run(TEST_TOKEN) #fishybot for testing 
 #bot.run(PROD_TOKEN) #gchq bot

@@ -42,6 +42,12 @@ def findWholeWord(w):
     return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
 
 @bot.event
+async def on_member_update(memberBefore, memberAfter):
+	if memberBefore.id == bot.user.id or memberAfter == bot.user.id:
+		return
+
+
+@bot.event
 async def on_message(message):
     if message.author == bot.user:
         return

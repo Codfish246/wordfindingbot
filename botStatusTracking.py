@@ -1,25 +1,10 @@
 #Made by Codfish246
 
-"""
-discord.on_member_update(before, after)
-Called when a Member updates their profile.
-
-This is called when one or more of the following things change:
-
-status
-
-activity
-
-nickname
-
-roles
-"""
-
 import discord
 import asyncio
 from datetime import datetime
 import re
-from os import getenv
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -35,7 +20,7 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     
-    await client.change_presence(activity=discord.Game(name='!help'))
+    await bot.change_presence(activity=discord.Game(name='!help'))
 
 def contains_word(s, w):
     return f' {w} ' in f' {s} '
@@ -43,11 +28,17 @@ def contains_word(s, w):
 def findWholeWord(w):
     return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
 
+global userToCheck
+global statusTrackChannel
+#nonlocal userToCheck
+#nonlocal statusTrackChannel
 userToCheck = 0
 statusTrackChannel = 0
 
 @bot.event
 async def on_message(message):
+    global userToCheck
+    global statusTrackChannel
     if message.author == bot.user:
         return
 
@@ -108,6 +99,7 @@ async def on_message(message):
     if message.content == ('!legacyfind'):
         channel = message.channel
         
+        #mainly for reference purposes now, hence being called legacy search
         await channel.send('Send the word you wish to find:')
         def check(m):
             return m.author == message.author and m.channel == channel
@@ -155,11 +147,11 @@ async def on_message(message):
         embed=discord.Embed(title="Help", description="Commands", color=0x191919)
         #embed=discord.Embed(title="Help", description="Commands\n(All time out in 60 secs)", color=0x191919)
         embed.set_author(name="GCHQ", icon_url="https://pbs.twimg.com/profile_images/1216637466440097792/6OmvLk7Y_400x400.jpg")
-        embed.add_field(name="Find section", value="", inline=False)
+        embed.add_field(name="Find section", value='-',inline=False)
         embed.add_field(name="!find", value="Main word finding command", inline=True)
         embed.add_field(name="!find2", value="Different word finding method, includes words inside other words, like 'word' in 'swordsmith'.", inline=True)
         embed.add_field(name="!legacyfind", value="Old version of the main word finding command.", inline=True)
-        embed.add_field(name="User status tracking section", value="", inline=False)
+        embed.add_field(name="User status tracking section", value='-', inline=False)
         embed.add_field(name="!trackuser", value="Sets a user id for tracking a user's status and sending an update when it changes.", inline=True)
         embed.add_field(name="!untrackuser", value="Untracks a user set by !trackuser", inline=True)
         embed.add_field(name="!trackingset", value="Shows the currently set user and logging channel.", inline=True)
@@ -173,60 +165,54 @@ async def on_message(message):
         await bot.close()
 
 
-    if message.content == ('!trackuser')
-    	channel = message.channel
-
-    	await channel.send('Send user\'s id to track:')
+    if message.content == ('!trackuser'):
+        channel = message.channel
+        await channel.send('Send user\'s id to track:')
         def check(m):
             return m.author == message.author and m.channel == channel
         userToCheckMsg = await bot.wait_for('message', check=check)
-        """emoji = '\N{THUMBS UP SIGN}'
+        """emoji = 'backslashN{THUMBS UP SIGN}'
         await userToCheckMsg.add_reaction(emoji)"""
         userToCheck = int(userToCheckMsg.content)
 
-        changeChannelSet = True
+        changeChannelSet = False
         if statusTrackChannel != 0:
-        	await channel.send('Channel id currently set to <#{0}> ({0}), Do you want to change it? React:').format(statusTrackChannel)
-	        emojiYes = '\N{THUMBS UP SIGN}'
-	        emojiNo = '\N{THUMBS DOWN SIGN}'
-	        await message.add_reaction(emojiYes)
-	        await message.add_reaction(emojiNo)
+            trackuserFormatString = ('Channel id currently set to <#{0}> ({0}), Do you want to change it? React:').format(statusTrackChannel)
+            await channel.send(trackuserFormatString)
+            emojiYes = '\N{THUMBS UP SIGN}'
+            emojiNo = '\N{THUMBS DOWN SIGN}'
+            await message.add_reaction(emojiYes)
+            await message.add_reaction(emojiNo)
 
-	        def check(reaction, user):
-	            return user == message.author and str(reaction.emoji) == '👍'
-	        try:
-	            reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
-	        except asyncio.TimeoutError:
-	            await channel.send('Timed out.')
-	        else:
-	            changeChannelSet = True
+            def check(reaction, user):
+                return user == message.author and (str(reaction.emoji) == '👍' or str(reaction.emoji) == '👎')
+            try:
+                reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+            except asyncio.TimeoutError:
+                await channel.send('Timed out.')
+            else:
+                if str(reaction.emoji) == '👍':
+                    changeChannelSet = True
+                elif str(reaction.emoji) == '👎':
+                    changeChannelSet = False
 
-	        def check(reaction, user):
-	            return user == message.author and str(reaction.emoji) == '👎'
-	        try:
-	            reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
-	        except asyncio.TimeoutError:
-	            await channel.send('Timed out.')
-	        else:
-	            changeChannelSet = False
+        if changeChannelSet == True:
+            await channel.send('Send channel id to post tracking status updates in:')
+            def check(m):
+                return m.author == message.author and m.channel == channel
+            statusTrackChannelMsg = await bot.wait_for('message', check=check)
+            """emoji = 'backslashN{THUMBS UP SIGN}'
+            await userToCheckMsg.add_reaction(emoji)"""
+            statusTrackChannel = int(statusTrackChannelMsg.content)
+            await channel.send('User id and channel id set and tracking started.')
+        elif changeChannelSet == False and statusTrackChannel != 0 and userToCheck != 0:
+            await channel.send('User id and channel id set and tracking started.')
+        else:
+            await channel.send('Error: probably something wrong with channel or user id, like it\'s not set or something.')
 
-	    if changeChannelSet == True:
-	        await channel.send('Send channel id to post tracking status updates in:')
-	        def check(m):
-	            return m.author == message.author and m.channel == channel
-	        statusTrackChannelMsg = await bot.wait_for('message', check=check)
-	        """emoji = '\N{THUMBS UP SIGN}'
-	        await userToCheckMsg.add_reaction(emoji)"""
-	        statusTrackChannel = int(statusTrackChannelMsg.content)
-	        await channel.send('User id and channel id set and tracking started.')
-	    elif changeChannelSet == False and statusTrackChannel != 0 and userToCheck != 0:
-	    	await channel.send('User id and channel id set and tracking started.')
-	    else:
-	    	await channel.send('Error: probably something wrong with channel or user id, like it\'s not set or something.')
-
-    if message.content == ('!untrackuser')
-    	channel = message.channel
-        """emoji = '\N{THUMBS UP SIGN}'
+    if message.content == ('!untrackuser'):
+        channel = message.channel
+        """emoji = 'backslashN{THUMBS UP SIGN}'
         await message.add_reaction(emoji)"""
 
         userToCheck = 0
@@ -235,23 +221,23 @@ async def on_message(message):
         await channel.send('User id unset and tracking stopped.')
 
 
-    if message.content == ('!trackingset')
-    	channel = message.channel
-    	if userToCheck != 0:
-    		fetchedUser = await bot.fetch_user(userToCheck)
-    		await channel.send('User ID set is: {0}, aka: {1}/<@{0}> \nChannel ID set is: {2}, aka: <#{2}>').format(userToCheck, fetchedUser.name, statusTrackChannel)
-    	else:
-    		await channel.send('Error: User or channel (ID) is not set')
+    if message.content == ('!trackingset'):
+        channel = message.channel
+        if userToCheck != 0:
+            fetchedUser = await bot.fetch_user(userToCheck)
+            trackingsetFormatString = ('User ID set is: {0}, aka: {1}/<@{0}> \nChannel ID set is: {2}, aka: <#{2}>').format(userToCheck, fetchedUser.name, statusTrackChannel)
+            await channel.send(trackingsetFormatString)
+        else:
+            await channel.send('Error: User or channel (ID) is not set')
 
 
 
 @bot.event
 async def on_member_update(memberBefore, memberAfter):
-	if memberBefore.id == bot.user.id or userToCheck == 0:
-		return
-
-	
-
+    global userToCheck
+    global statusTrackChannel
+    if memberBefore.id == bot.user.id or userToCheck == 0:
+        return
 
 
 bot.run(TEST_TOKEN) #fishybot for testing 

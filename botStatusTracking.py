@@ -41,10 +41,7 @@ def contains_word(s, w):
 def findWholeWord(w):
     return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
 
-@bot.event
-async def on_member_update(memberBefore, memberAfter):
-	if memberBefore.id == bot.user.id or memberAfter == bot.user.id:
-		return
+userToCheck = 0
 
 
 @bot.event
@@ -157,6 +154,7 @@ async def on_message(message):
         embed.add_field(name="!find", value="Main word finding command", inline=True)
         embed.add_field(name="!find2", value="Different word finding method, includes words inside other words, like 'word' in 'swordsmith'.", inline=True)
         embed.add_field(name="!legacyfind", value="Old version of the main word finding command.", inline=True)
+        embed.add_field(name="!trackuser", value="Tracks a user's status and sends an update when it changes.", inline=False)
         embed.set_footer(text="Sent " + dt_string)
         await channel.send(embed=embed)
 
@@ -164,6 +162,29 @@ async def on_message(message):
         emoji = '\N{THUMBS UP SIGN}'
         await message.add_reaction(emoji)
         await bot.close()
+
+    if message.content == ('!trackuser')
+    	channel = message.channel
+    	await channel.send('Send user\'s id to track:')
+        def check(m):
+            return m.author == message.author and m.channel == channel
+
+        userToCheckMsg = await bot.wait_for('message', check=check)
+        """emoji = '\N{THUMBS UP SIGN}'
+        await userToCheckMsg.add_reaction(emoji)"""
+        userToCheck = userToCheckMsg.content
+        await channel.send('User id set and tracking started.')
+
+
+    	
+
+
+@bot.event
+async def on_member_update(memberBefore, memberAfter):
+	if memberBefore.id == bot.user.id or memberAfter == bot.user.id or userToCheck == 0:
+		return
+
+
 
 
 bot.run(TEST_TOKEN) #fishybot for testing 

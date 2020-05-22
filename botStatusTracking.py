@@ -154,7 +154,8 @@ async def on_message(message):
         embed.add_field(name="!find", value="Main word finding command", inline=True)
         embed.add_field(name="!find2", value="Different word finding method, includes words inside other words, like 'word' in 'swordsmith'.", inline=True)
         embed.add_field(name="!legacyfind", value="Old version of the main word finding command.", inline=True)
-        embed.add_field(name="!trackuser", value="Tracks a user's status and sends an update when it changes.", inline=False)
+        embed.add_field(name="!trackuser", value="Sets a user id for tracking a user's status and sending an update when it changes.", inline=False)
+        embed.add_field(name="!untrackuser", value="Untracks a user set by !trackuser", inline=False)
         embed.set_footer(text="Sent " + dt_string)
         await channel.send(embed=embed)
 
@@ -175,6 +176,13 @@ async def on_message(message):
         userToCheck = userToCheckMsg.content
         await channel.send('User id set and tracking started.')
 
+    if message.content == ('!untrackuser')
+    	channel = message.channel
+        """emoji = '\N{THUMBS UP SIGN}'
+        await userToCheckMsg.add_reaction(emoji)"""
+        userToCheck = 0
+        await channel.send('User id unset and tracking stopped.')
+
 
     	
 
@@ -183,6 +191,7 @@ async def on_message(message):
 async def on_member_update(memberBefore, memberAfter):
 	if memberBefore.id == bot.user.id or memberAfter == bot.user.id or userToCheck == 0:
 		return
+
 
 
 

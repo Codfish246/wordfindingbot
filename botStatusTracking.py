@@ -30,15 +30,18 @@ def findWholeWord(w):
 
 global userToCheck
 global statusTrackChannel
+global presenceTracking
 #nonlocal userToCheck
 #nonlocal statusTrackChannel
 userToCheck = 0
 statusTrackChannel = 0
+presenceTracking = False
 
 @bot.event
 async def on_message(message):
     global userToCheck
     global statusTrackChannel
+    global presenceTracking
     if message.author == bot.user:
         return
 
@@ -158,10 +161,11 @@ async def on_message(message):
         embed.set_footer(text="Sent " + dt_string)
         await channel.send(embed=embed)
 
-
+    emojiYes = '\N{THUMBS UP SIGN}'
+    emojiNo = '\N{THUMBS DOWN SIGN}'
     if message.content == ('!shutdown') and message.author.id == 102341036403068928:
-        emoji = '\N{THUMBS UP SIGN}'
-        await message.add_reaction(emoji)
+        #emoji = '\N{THUMBS UP SIGN}'
+        await message.add_reaction(emojiYes)
         await bot.close()
 
 
@@ -175,14 +179,13 @@ async def on_message(message):
         await userToCheckMsg.add_reaction(emoji)"""
         userToCheck = int(userToCheckMsg.content)
 
-        changeChannelSet = True
+        ##########-----####################----##############----##########---#############----#############-----###############-----#######-----##### #bad code atm
+        #fix duplicate conditions here in changechannelset
         if statusTrackChannel != 0:
-            trackuserFormatString = ('Channel id currently set to <#{0}> ({0}), Do you want to change it? React: ⬆').format(statusTrackChannel)
-            await channel.send(trackuserFormatString)
-            emojiYes = '\N{THUMBS UP SIGN}'
-            emojiNo = '\N{THUMBS DOWN SIGN}'
-            await userToCheckMsg.add_reaction(emojiYes)
-            await userToCheckMsg.add_reaction(emojiNo)
+            trackuserFormatString = ('Channel id currently set to <#{0}> ({0}), Do you want to change it? React: 👍 or 👎').format(statusTrackChannel)
+            sentStatusChannelChangeMsg = await channel.send(trackuserFormatString)
+            await sentStatusChannelChangeMsg.add_reaction(emojiYes)
+            await sentStatusChannelChangeMsg.add_reaction(emojiNo)
 
             def check(reaction, user):
                 return user == message.author and (str(reaction.emoji) == '👍' or str(reaction.emoji) == '👎')
@@ -220,10 +223,29 @@ async def on_message(message):
                 await userToCheckMsg.add_reaction(emoji)"""
                 statusTrackChannel = int(statusTrackChannelMsg.content)
                 await channel.send('User id and channel id set and tracking started.')
+
             elif changeChannelSet == False and statusTrackChannel != 0 and userToCheck != 0:
-                await channel.send('User id and channel id set and tracking started.')
+                """enablePresTrackMsg = await channel.send('Do you want to enable user presence (Custom statuses/Playing statuses etc.) tracking as well? React: 👍 or 👎')
+                await enablePresTrackMsg.add_reaction(emojiYes)
+                await enablePresTrackMsg.add_reaction(emojiNo)
+
+                def check(reaction, user):
+                return user == message.author and (str(reaction.emoji) == '👍' or str(reaction.emoji) == '👎')
+                
+                try:
+                    reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+                except asyncio.TimeoutError:
+                    await channel.send('Timed out.')
+                else:
+                    if str(reaction.emoji) == '👍':
+                        presenceTracking = True
+                        await channel.send('User id and channel id set and status + presence tracking started.')
+                    elif str(reaction.emoji) == '👎':
+                        presenceTracking = False
+                        await channel.send('User id and channel id set and status tracking started.')""" #fix duplicate conditions up there first
             else:
                 await channel.send('Error: probably something wrong with channel or user id, like it\'s not set or something.')
+        ##########-----####################----##############----##########---#############----#############-----###############-----#######-----########--------############-------########## #bad code atm
 
     if message.content == ('!untrackuser'):
         channel = message.channel
@@ -251,16 +273,28 @@ async def on_message(message):
 async def on_member_update(memberBefore, memberAfter):
     global userToCheck
     global statusTrackChannel
+    global presenceTracking
+    """print(userToCheck)
+    print(statusTrackChannel)
+    print(memberBefore.id)
+    print(memberBefore.status)
+    print(memberAfter.status)
+    print(memberBefore.activity)
+    print(memberAfter.activity)""" #testing
     if memberBefore.id == bot.user.id or userToCheck == 0:
         return
 
-    if memberBefore.id == userToCheck and not (memberBefore.status == memberAfter.status or memberBefore.activity == memberAfter.activity):
+    if memberBefore.id == userToCheck and not memberBefore.status == memberAfter.status:
         channel = bot.get_channel(statusTrackChannel)
-
-        statusChangeFormatStr = ('❗{0}\'s ({0}) status or activity has changed from: {1}, to: {2} \nOr activity, from: {3}, to: {4} \nWas user on mobile: {5}, is user now on mobile: {6}\n User\'s status on mobile: Before {7} Now {8}, User\'s status on desktop: Before {9} Now {10}, User\'s status on web: Before {11} Now {12}').format(userToCheck, memberBefore.status, memberAfter.status, memberBefore.activity, memberAfter.activity, memberBefore.is_on_mobile(), memberAfter.is_on_mobile(), memberBefore.mobile_status, memberAfter.mobile_status, memberBefore.desktop_status, memberAfter.desktop_status, memberBefore.web_status, memberAfter.web_status)
+        statusChangeFormatStr = ('❗<@{0}>\'s ({0}) status has changed from: {1}, to: {2} \nWas user on mobile: {3}, is user now on mobile: {4}\n User\'s status on mobile: Before {5} Now {6}, User\'s status on desktop: Before {7} Now {8}, User\'s status on web: Before {9} Now {10}').format(userToCheck, memberBefore.status, memberAfter.status, memberBefore.is_on_mobile(), memberAfter.is_on_mobile(), memberBefore.mobile_status, memberAfter.mobile_status, memberBefore.desktop_status, memberAfter.desktop_status, memberBefore.web_status, memberAfter.web_status)
         await channel.send(statusChangeFormatStr)
-    else:
-        return
+
+    if memberBefore.id == userToCheck and not memberBefore.activity == memberAfter.activity and presenceTracking == True:
+        channel = bot.get_channel(statusTrackChannel)
+        activityChngeFormatStr = ('❗<@{0}>\'s ({0}) activity has changed from: {1}, to: {2}').format(userToCheck, memberBefore.activity, memberAfter.activity)
+        await channel.send(activityChngeFormatStr)
+
+
 
 
 bot.run(TEST_TOKEN) #fishybot for testing 

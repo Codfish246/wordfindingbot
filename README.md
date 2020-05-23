@@ -3,4 +3,4 @@ discord bot to search paragraphs of text and find specified words in them, may b
 
 #### if questions about ethics of this status/presence tracking stuff (as this is the readme for the presence tracking branch)
 (if and when when this repo goes public)
-it wasn't for me, was asked to make it, and well, it was a nice challenge as i hadn't done bot stuff in ages
+it wasn't for me, was asked to make it, and well, it was a nice challenge as i hadn't done bot stuff in ages, and it's not very bad anyway, probably quite useful in some cases like figuring out alts

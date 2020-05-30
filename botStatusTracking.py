@@ -177,7 +177,8 @@ async def on_message(message):
         userToCheckMsg = await bot.wait_for('message', check=check)
         """emoji = 'backslashN{THUMBS UP SIGN}'
         await userToCheckMsg.add_reaction(emoji)"""
-        if (userToCheckMsg.content).isNumeric(): userToCheck = int(userToCheckMsg.content) else: await channel.send('Error, Input not numeric id')
+        #if (userToCheckMsg.content).isNumeric(): userToCheck = int(userToCheckMsg.content) else: await channel.send('Error, Input not numeric id') #not valid one line if
+        userToCheck = int(userToCheckMsg.content) if (userToCheckMsg.content).isNumeric() else await channel.send('Error, Input not numeric id')
 
         changeChannelSet = True
         if statusTrackChannel != 0:
@@ -205,7 +206,8 @@ async def on_message(message):
                 return m.author == message.author and m.channel == channel
             
             statusTrackChannelMsg = await bot.wait_for('message', check=check)
-            if (statusTrackChannelMsg.content).isNumeric(): statusTrackChannel = int(statusTrackChannelMsg.content) else: await channel.send('Error, Input not numeric id, try again')
+            #if (statusTrackChannelMsg.content).isNumeric(): statusTrackChannel = int(statusTrackChannelMsg.content) else: await channel.send('Error, Input not numeric id, try again') #invalid oneline if
+            statusTrackChannel = int(statusTrackChannelMsg.content) if (statusTrackChannelMsg.content).isNumeric() else await channel.send('Error, Input not numeric id, try again')
 
 
             enablePresTrackMsg = await channel.send('Do you want to enable user presence (Custom statuses/Playing statuses etc.) tracking as well? React: 👍 or 👎')

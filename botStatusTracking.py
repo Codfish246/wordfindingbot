@@ -113,9 +113,9 @@ async def on_message(message):
         except asyncio.TimeoutError:
             await channel.send('*Input timed out!*')
         else:
-            await channel.send('Send the text you wish to search:')"""
+            await channel.send('Send the text you wish to search:')""" #experimental text input timeout thing
 
-        ######------------------------------#######
+        
 
         await channel.send('Send the text you wish to search:')
         def check(m):
@@ -140,7 +140,7 @@ async def on_message(message):
                 if (contains_word(textToSearch.content, wordToFind.content)):
                     await channel.send('Word ' + wordToFind.content + ' found in text!')
                 else:
-                    await channel.send('Word ' + wordToFind.content + ' not found in text.')"""
+                    await channel.send('Word ' + wordToFind.content + ' not found in text.')""" #experimental text input timeout thing
         
 
     if message.content.startswith('!help'):
@@ -177,10 +177,9 @@ async def on_message(message):
         userToCheckMsg = await bot.wait_for('message', check=check)
         """emoji = 'backslashN{THUMBS UP SIGN}'
         await userToCheckMsg.add_reaction(emoji)"""
-        userToCheck = int(userToCheckMsg.content)
+        if (userToCheckMsg.content).isNumeric(): userToCheck = int(userToCheckMsg.content) else: await channel.send('Error, Input not numeric id')
 
-        ##########-----####################----##############----##########---#############----#############-----###############-----#######-----##### #bad code atm
-        #fix duplicate conditions here in changechannelset
+        changeChannelSet = True
         if statusTrackChannel != 0:
             trackuserFormatString = ('Channel id currently set to <#{0}> ({0}), Do you want to change it? React: 👍 or 👎').format(statusTrackChannel)
             sentStatusChannelChangeMsg = await channel.send(trackuserFormatString)
@@ -191,7 +190,7 @@ async def on_message(message):
                 return user == message.author and (str(reaction.emoji) == '👍' or str(reaction.emoji) == '👎')
             
             try:
-                reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+                reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=check)
             except asyncio.TimeoutError:
                 await channel.send('Timed out.')
             else:
@@ -200,52 +199,39 @@ async def on_message(message):
                 elif str(reaction.emoji) == '👎':
                     changeChannelSet = False
 
-            if changeChannelSet == True:
-                await channel.send('Send channel id to post tracking status updates in:')
-                def check(m):
-                    return m.author == message.author and m.channel == channel
-                statusTrackChannelMsg = await bot.wait_for('message', check=check)
-                """emoji = 'backslashN{THUMBS UP SIGN}'
-                await userToCheckMsg.add_reaction(emoji)"""
-                statusTrackChannel = int(statusTrackChannelMsg.content)
-                await channel.send('User id and channel id set and tracking started.')
-            elif changeChannelSet == False and statusTrackChannel != 0 and userToCheck != 0:
-                await channel.send('User id and channel id set and tracking started.')
-            else:
-                await channel.send('Error: probably something wrong with channel or user id, like it\'s not set or something.')
-        else:
-            if changeChannelSet == True:
-                await channel.send('Send channel id to post tracking status updates in:')
-                def check(m):
-                    return m.author == message.author and m.channel == channel
-                statusTrackChannelMsg = await bot.wait_for('message', check=check)
-                """emoji = 'backslashN{THUMBS UP SIGN}'
-                await userToCheckMsg.add_reaction(emoji)"""
-                statusTrackChannel = int(statusTrackChannelMsg.content)
-                await channel.send('User id and channel id set and tracking started.')
+        if statusTrackChannel == 0 or changeChannelSet == True:
+            await channel.send('Send channel id to post tracking status updates in:')
+            def check(m):
+                return m.author == message.author and m.channel == channel
+            
+            statusTrackChannelMsg = await bot.wait_for('message', check=check)
+            if (statusTrackChannelMsg.content).isNumeric(): statusTrackChannel = int(statusTrackChannelMsg.content) else: await channel.send('Error, Input not numeric id, try again')
 
-            elif changeChannelSet == False and statusTrackChannel != 0 and userToCheck != 0:
-                """enablePresTrackMsg = await channel.send('Do you want to enable user presence (Custom statuses/Playing statuses etc.) tracking as well? React: 👍 or 👎')
-                await enablePresTrackMsg.add_reaction(emojiYes)
-                await enablePresTrackMsg.add_reaction(emojiNo)
 
-                def check(reaction, user):
+            enablePresTrackMsg = await channel.send('Do you want to enable user presence (Custom statuses/Playing statuses etc.) tracking as well? React: 👍 or 👎')
+            await enablePresTrackMsg.add_reaction(emojiYes)
+            await enablePresTrackMsg.add_reaction(emojiNo)
+
+            def check(reaction, user):
                 return user == message.author and (str(reaction.emoji) == '👍' or str(reaction.emoji) == '👎')
-                
-                try:
-                    reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
-                except asyncio.TimeoutError:
-                    await channel.send('Timed out.')
-                else:
-                    if str(reaction.emoji) == '👍':
-                        presenceTracking = True
-                        await channel.send('User id and channel id set and status + presence tracking started.')
-                    elif str(reaction.emoji) == '👎':
-                        presenceTracking = False
-                        await channel.send('User id and channel id set and status tracking started.')""" #fix duplicate conditions up there first
+            
+            try:
+                reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=check)
+            except asyncio.TimeoutError:
+                await channel.send('Timed out.')
             else:
-                await channel.send('Error: probably something wrong with channel or user id, like it\'s not set or something.')
-        ##########-----####################----##############----##########---#############----#############-----###############-----#######-----########--------############-------########## #bad code atm
+                if str(reaction.emoji) == '👍':
+                    presenceTracking = True
+                    await channel.send('User id and channel id set and status + presence tracking started.')
+                elif str(reaction.emoji) == '👎':
+                    presenceTracking = False
+                    await channel.send('User id and channel id set and status tracking started.')
+                    
+        elif changeChannelSet == False:
+            await channel.send('User id and channel id set and tracking started.')
+        else:
+            await channel.send('Error, try again.')
+
 
     if message.content == ('!untrackuser'):
         channel = message.channel
@@ -297,5 +283,5 @@ async def on_member_update(memberBefore, memberAfter):
 
 
 
-bot.run(TEST_TOKEN) #fishybot for testing 
+bot.run(TEST_TOKEN) #fishybot for testing
 #bot.run(PROD_TOKEN) #gchq bot
